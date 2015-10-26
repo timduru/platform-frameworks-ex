@@ -1,4 +1,3 @@
-#
 # Copyright (C) 2014 The Android Open Source Project
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,17 +11,30 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-#
 
-LOCAL_PATH := $(call my-dir)
+LOCAL_PATH:= $(call my-dir)
 include $(CLEAR_VARS)
 
-LOCAL_MODULE := android-common-framesequence
-LOCAL_SDK_VERSION := 8
-LOCAL_SRC_FILES := $(call all-java-files-under, src)
+LOCAL_PACKAGE_NAME := FrameSequenceSample
 
+# java dependency
+LOCAL_STATIC_JAVA_LIBRARIES += android-common-framesequence
+
+# native dependency
+ifneq (,$(TARGET_BUILD_APPS))
+  LOCAL_JNI_SHARED_LIBRARIES := libframesequence
+else
+  LOCAL_REQUIRED_MODULES := libframesequence
+endif
+
+# proguard for framesequence library code
 LOCAL_PROGUARD_FLAG_FILES := proguard.flags
 
-include $(BUILD_STATIC_JAVA_LIBRARY)
+LOCAL_SDK_VERSION := 19
 
-include $(call all-makefiles-under, $(LOCAL_PATH))
+LOCAL_SRC_FILES := $(call all-java-files-under, src)
+LOCAL_RESOURCE_DIR := $(addprefix $(LOCAL_PATH)/, res)
+LOCAL_AAPT_FLAGS := --auto-add-overlay
+LOCAL_AAPT_FLAGS += --extra-packages com.android.framesequence.samples
+
+include $(BUILD_PACKAGE)
